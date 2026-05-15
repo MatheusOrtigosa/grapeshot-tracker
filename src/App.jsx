@@ -288,7 +288,8 @@ const NAV_TABS = [
   { key: "decks",     label: "Decks",     icon: "🃏" },
 ];
 
-const Header = ({ page, setPage, user, onLogout }) => (
+const Header = ({ page, setPage, user, onLogout }) => {
+  return (
   <>
     <header style={{
       borderBottom: "1px solid var(--border)",
@@ -308,15 +309,14 @@ const Header = ({ page, setPage, user, onLogout }) => (
                 </radialGradient>
               </defs>
               <circle cx="18" cy="18" r="17" fill="url(#lg)" stroke="rgba(201,168,76,0.5)" strokeWidth="1"/>
-              <text x="18" y="25" textAnchor="middle" fontSize="18" fontFamily="serif" fill="#0a0c10">⚡</text>
+              <text x="18" y="25" textAnchor="middle" fontSize="18" fontFamily="serif" fill="#2c2416">⚡</text>
             </svg>
             <div>
-              <div className="header-logo-text" style={{ fontFamily: "'Cinzel', serif", fontSize: 18, fontWeight: 900, color: "var(--gold2)", letterSpacing: "0.1em", lineHeight: 1 }}>TEAM GRAPESHOT</div>
+              <div className="header-logo-text" style={{ fontFamily: "'Cinzel', serif", fontSize: 18, fontWeight: 900, color: "var(--gold)", letterSpacing: "0.1em", lineHeight: 1 }}>TEAM GRAPESHOT</div>
               <div className="header-subtitle" style={{ fontFamily: "'Crimson Pro', serif", fontSize: 11, color: "var(--muted)", letterSpacing: "0.12em", textTransform: "uppercase" }}>Match Tracker</div>
             </div>
           </div>
 
-          {/* User info + logout */}
           {user && (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ textAlign: "right" }}>
@@ -330,17 +330,18 @@ const Header = ({ page, setPage, user, onLogout }) => (
           )}
         </div>
 
-        {/* Desktop nav tabs */}
-        <nav style={{ display: "flex", gap: 2 }} className="desktop-nav">
+        {/* Desktop nav */}
+        <nav className="desktop-nav" style={{ display: "flex", gap: 2 }}>
           {NAV_TABS.map(tab => (
             <button key={tab.key} onClick={() => setPage(tab.key)} style={{
               fontFamily: "'Cinzel', serif", fontSize: 11, letterSpacing: "0.07em",
               background: "none", border: "none", cursor: "pointer",
               color: page === tab.key ? "var(--gold)" : "var(--muted)",
               padding: "8px 16px",
-              borderBottom: page === tab.key ? "2px solid var(--gold3)" : "2px solid transparent",
+              borderBottom: page === tab.key ? `2px solid var(--gold3)` : "2px solid transparent",
               transition: "all 0.2s",
               fontWeight: page === tab.key ? 700 : 400,
+              touchAction: "manipulation",
             }}>
               {tab.icon} {tab.label}
             </button>
@@ -349,8 +350,8 @@ const Header = ({ page, setPage, user, onLogout }) => (
       </div>
     </header>
 
-    {/* Mobile bottom nav */}
-    <nav className="mobile-nav" style={{ display: "none" }}>
+    {/* Mobile bottom nav — shown via CSS media query */}
+    <nav className="mobile-nav">
       {NAV_TABS.map(tab => (
         <button key={tab.key} onClick={() => setPage(tab.key)} className={page === tab.key ? "active" : ""}>
           <span className="nav-icon">{tab.icon}</span>
@@ -359,7 +360,8 @@ const Header = ({ page, setPage, user, onLogout }) => (
       ))}
     </nav>
   </>
-);
+  );
+};
 
 // ─── FILTER PILL ──────────────────────────────────────────────────────────────
 const FilterPill = ({ label, active, onClick, onClear }) => (
