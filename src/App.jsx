@@ -8,31 +8,31 @@ const GlobalStyle = () => (
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0a0c10;
-      --bg2:       #10141c;
-      --bg3:       #161b26;
-      --surface:   #1c2130;
-      --surface2:  #222840;
-      --border:    rgba(180,140,60,0.18);
-      --border2:   rgba(180,140,60,0.38);
-      --gold:      #c9a84c;
-      --gold2:     #e8c96a;
-      --gold3:     #f5dfa0;
-      --red:       #c94c4c;
-      --red2:      #e86a6a;
-      --green:     #4cad6f;
-      --green2:    #6ecca0;
-      --blue:      #4c7fc9;
-      --blue2:     #6aaae8;
-      --purple:    #8c5cc9;
-      --muted:     #6b7a99;
-      --text:      #d4cfc0;
-      --text2:     #a09880;
-      --white:     #f0ead8;
+      --bg:        #f5f0e8;
+      --bg2:       #fffdf8;
+      --bg3:       #ede8de;
+      --surface:   #ffffff;
+      --surface2:  #faf7f2;
+      --border:    rgba(120,90,30,0.14);
+      --border2:   rgba(120,90,30,0.28);
+      --gold:      #8a6420;
+      --gold2:     #6b4e18;
+      --gold3:     #c9a84c;
+      --red:       #b33a3a;
+      --red2:      #922e2e;
+      --green:     #2e7d4f;
+      --green2:    #1e5c39;
+      --blue:      #2a5f9e;
+      --blue2:     #1d4a80;
+      --purple:    #5c3d9e;
+      --muted:     #8a7e6a;
+      --text:      #2c2416;
+      --text2:     #5c5040;
+      --white:     #2c2416;
       --radius:    10px;
       --radius2:   16px;
-      --shadow:    0 4px 24px rgba(0,0,0,0.6);
-      --glow:      0 0 24px rgba(201,168,76,0.15);
+      --shadow:    0 2px 16px rgba(120,90,30,0.1);
+      --shadow2:   0 8px 40px rgba(120,90,30,0.15);
     }
 
     body {
@@ -44,22 +44,21 @@ const GlobalStyle = () => (
       overflow-x: hidden;
     }
 
-    /* Arcane background pattern */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 40% at 80% 80%, rgba(140,92,201,0.05) 0%, transparent 60%),
-        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.025'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        radial-gradient(ellipse 70% 50% at 50% -5%, rgba(201,168,76,0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 40% at 90% 90%, rgba(138,100,32,0.06) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%238a6420' fill-opacity='0.04'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
     }
 
     #root { position: relative; z-index: 1; }
 
-    h1, h2, h3, h4 { font-family: 'Cinzel', serif; font-weight: 600; color: var(--white); letter-spacing: 0.04em; }
+    h1, h2, h3, h4 { font-family: 'Cinzel', serif; font-weight: 600; color: var(--text); letter-spacing: 0.04em; }
 
     .btn {
       font-family: 'Cinzel', serif;
@@ -72,45 +71,49 @@ const GlobalStyle = () => (
       padding: 8px 18px;
       border-radius: var(--radius);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.18s;
       text-transform: uppercase;
       white-space: nowrap;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
     }
-    .btn:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold2); }
+    .btn:hover { background: rgba(138,100,32,0.08); border-color: var(--gold); color: var(--gold2); }
     .btn:active { transform: scale(0.97); }
     .btn.primary {
-      background: linear-gradient(135deg, #b8942a, #c9a84c);
-      border-color: var(--gold2);
-      color: #0a0c10;
+      background: linear-gradient(135deg, #8a6420, #c9a84c);
+      border-color: #c9a84c;
+      color: #fff;
     }
-    .btn.primary:hover { background: linear-gradient(135deg, #c9a84c, #e8c96a); }
-    .btn.danger { border-color: rgba(201,76,76,0.4); color: var(--red2); }
-    .btn.danger:hover { background: rgba(201,76,76,0.1); border-color: var(--red2); }
+    .btn.primary:hover { background: linear-gradient(135deg, #7a5618, #b8942a); }
+    .btn.danger { border-color: rgba(179,58,58,0.35); color: var(--red); }
+    .btn.danger:hover { background: rgba(179,58,58,0.07); border-color: var(--red); }
     .btn.sm { font-size: 10px; padding: 5px 12px; }
 
     input, select, textarea {
       background: var(--bg2);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border2);
       border-radius: var(--radius);
       color: var(--text);
       font-family: 'Crimson Pro', serif;
-      font-size: 16px; /* 16px evita zoom automático no iOS */
+      font-size: 16px;
       padding: 10px 14px;
       width: 100%;
-      transition: border-color 0.2s;
+      transition: border-color 0.18s, box-shadow 0.18s;
       outline: none;
       -webkit-appearance: none;
     }
     input:focus, select:focus, textarea:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+      border-color: var(--gold3);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
     }
-    input::placeholder, textarea::placeholder { color: var(--muted); }
-    select option { background: var(--bg2); }
+    input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
+    select option { background: var(--bg2); color: var(--text); }
 
-    label { font-size: 12px; font-family: 'Cinzel', serif; letter-spacing: 0.06em; color: var(--gold2); text-transform: uppercase; display: block; margin-bottom: 6px; }
+    label {
+      font-size: 11px; font-family: 'Cinzel', serif;
+      letter-spacing: 0.07em; color: var(--gold);
+      text-transform: uppercase; display: block; margin-bottom: 6px; font-weight: 600;
+    }
 
     .card {
       background: var(--surface);
@@ -119,136 +122,115 @@ const GlobalStyle = () => (
       padding: 20px;
       position: relative;
       overflow: hidden;
+      box-shadow: var(--shadow);
     }
     .card::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      opacity: 0.4;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
     }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.07em; padding: 3px 10px;
+      border-radius: 20px; text-transform: uppercase;
     }
-    .badge.win  { background: rgba(76,173,111,0.15); color: var(--green2); border: 1px solid rgba(76,173,111,0.3); }
-    .badge.loss { background: rgba(201,76,76,0.15);  color: var(--red2);   border: 1px solid rgba(201,76,76,0.3); }
-    .badge.draw { background: rgba(107,122,153,0.15); color: var(--muted); border: 1px solid rgba(107,122,153,0.3); }
+    .badge.win  { background: #e8f5ee; color: #1e6b40; border: 1px solid #a8d8bc; }
+    .badge.loss { background: #fdeaea; color: #8b2020; border: 1px solid #f0b0b0; }
+    .badge.draw { background: #f0ece4; color: #7a6e5c; border: 1px solid #ccc4b0; }
 
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border2), transparent);
-      margin: 20px 0;
-    }
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border2), transparent); margin: 20px 0; }
 
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg3); }
     ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-    @keyframes shimmer { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
-    .fade-in { animation: fadeIn 0.35s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    @keyframes shimmer { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .fade-in { animation: fadeIn 0.3s ease both; }
 
-    /* ── MOBILE ──────────────────────────────────────────────────────────────── */
+    /* ── MOBILE ─────────────────────────────────────────────────────────────── */
     @media (max-width: 640px) {
 
-      /* Nav vira bottom bar fixa */
       .mobile-nav {
         position: fixed;
-        bottom: 0; left: 0; right: 0;
-        z-index: 200;
-        background: rgba(10,12,16,0.97);
+        bottom: 0; left: 0; right: 0; z-index: 200;
+        background: rgba(255,253,248,0.97);
         backdrop-filter: blur(16px);
         border-top: 1px solid var(--border2);
         display: flex;
         padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+        box-shadow: 0 -2px 16px rgba(120,90,30,0.08);
       }
       .mobile-nav button {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 3px;
-        padding: 6px 4px;
-        background: none;
-        border: none;
-        cursor: pointer;
+        flex: 1; display: flex; flex-direction: column;
+        align-items: center; gap: 2px; padding: 6px 4px;
+        background: none; border: none; cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
       }
       .mobile-nav .nav-icon { font-size: 20px; line-height: 1; }
       .mobile-nav .nav-label {
-        font-family: 'Cinzel', serif;
-        font-size: 8px;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        color: var(--muted);
+        font-family: 'Cinzel', serif; font-size: 8px;
+        letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
       }
-      .mobile-nav button.active .nav-icon { filter: drop-shadow(0 0 6px var(--gold)); }
-      .mobile-nav button.active .nav-label { color: var(--gold2); }
+      .mobile-nav button.active .nav-label { color: var(--gold); font-weight: 700; }
 
-      /* Main padding-bottom para não ficar atrás da nav */
       .main-mobile { padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important; }
 
-      /* Header compacto */
       .header-logo-text { display: none; }
       .header-subtitle   { display: none; }
-      .header-user-email { display: none; }
       .header-top { padding: 10px 0 8px !important; }
       .header-top-inner { padding: 0 16px !important; }
 
-      /* Cards com padding menor */
       .card { padding: 14px; }
 
-      /* Grids: 1 coluna */
-      .grid-stats   { grid-template-columns: repeat(2, 1fr) !important; }
-      .grid-decks   { grid-template-columns: 1fr !important; }
+      .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
+      .grid-decks { grid-template-columns: 1fr !important; }
 
-      /* Hero banner compacto */
-      .hero-wr { font-size: 40px !important; }
+      .hero-wr { font-size: 38px !important; }
 
-      /* Formulários: grids viram 1 col */
       .form-grid-2 { grid-template-columns: 1fr !important; }
       .form-grid-3 { grid-template-columns: 1fr 1fr !important; }
       .form-grid-4 { grid-template-columns: 1fr 1fr !important; }
 
-      /* Matchup table: oculta colunas menos importantes */
       .mu-col-hide { display: none !important; }
 
-      /* Modal: tela cheia */
-      .deck-modal-inner {
-        max-width: 100% !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
-        min-height: 100dvh;
-      }
+      /* Modal tela cheia corrigido */
       .deck-modal-wrap {
         padding: 0 !important;
-        align-items: flex-start !important;
+        align-items: stretch !important;
+        overflow-y: auto;
+      }
+      .deck-modal-inner {
+        max-width: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
+      .deck-modal-body {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
-      /* Inline form: grids */
       .inline-deck-grid { grid-template-columns: 1fr !important; }
-
-      /* Filter bar: wrap */
       .filter-bar { flex-wrap: wrap !important; gap: 8px !important; }
       .filter-bar select { font-size: 12px !important; }
-
-      /* Match card: stack */
       .match-card-inner { flex-wrap: wrap !important; gap: 8px !important; }
-
-      /* Oculta texto longo no header */
       .user-email-full { display: none !important; }
+
+      /* Desktop nav escondida no mobile */
+      .desktop-nav { display: none !important; }
+    }
+
+    /* Desktop: bottom nav escondida */
+    @media (min-width: 641px) {
+      .mobile-nav { display: none !important; }
     }
   `}</style>
 );
@@ -309,7 +291,7 @@ const Header = ({ page, setPage, user, onLogout }) => (
   <>
     <header style={{
       borderBottom: "1px solid var(--border)",
-      background: "rgba(10,12,16,0.95)",
+      background: "rgba(245,240,232,0.96)",
       backdropFilter: "blur(12px)",
       position: "sticky", top: 0, zIndex: 100,
     }}>
@@ -560,14 +542,14 @@ const Dashboard = ({ matches, decks }) => {
 
       {/* ── HERO BANNER ── */}
       <div style={{
-        background: "linear-gradient(135deg, var(--surface) 0%, #1a1428 100%)",
+        background: "linear-gradient(135deg, #fffdf8 0%, #f5ead8 100%)",
         border: "1px solid var(--border)",
         borderRadius: var_radius2,
         padding: "28px 32px",
         position: "relative",
         overflow: "hidden",
       }}>
-        <div style={{ position: "absolute", top: -20, right: -20, fontSize: 120, opacity: 0.04, fontFamily: "serif", lineHeight: 1 }}>⚡</div>
+        <div style={{ position: "absolute", top: -20, right: -20, fontSize: 120, opacity: 0.05, fontFamily: "serif", lineHeight: 1, color: "#8a6420" }}>⚡</div>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, var(--gold), transparent)", opacity: 0.3 }} />
         <div style={{ fontFamily: "'Cinzel', serif", fontSize: 11, letterSpacing: "0.12em", color: "var(--muted)", textTransform: "uppercase", marginBottom: 8 }}>
           {hasFilter ? "Performance Filtrada" : "Performance Geral"}
@@ -1223,7 +1205,7 @@ const DeckDetail = ({ deck, onSave, onClose }) => {
   return (
     <div className="deck-modal-wrap" style={{
       position: "fixed", inset: 0, zIndex: 200,
-      background: "rgba(5,7,12,0.85)", backdropFilter: "blur(6px)",
+      background: "rgba(120,90,30,0.4)", backdropFilter: "blur(6px)",
       display: "flex", alignItems: "flex-start", justifyContent: "center",
       padding: "24px 16px", overflowY: "auto",
     }}>
@@ -1231,14 +1213,14 @@ const DeckDetail = ({ deck, onSave, onClose }) => {
         width: "100%", maxWidth: isOwn ? 820 : 560,
         background: "var(--bg2)", border: "1px solid var(--border2)",
         borderRadius: "var(--radius2)", overflow: "hidden",
-        boxShadow: "0 24px 80px rgba(0,0,0,0.8)",
+        boxShadow: "var(--shadow2)",
         animation: "fadeIn 0.25s ease",
       }}>
         {/* Modal header */}
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "18px 24px", borderBottom: "1px solid var(--border)",
-          background: "var(--surface)",
+          background: "var(--surface2)",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 22 }}>{isOwn ? "🃏" : "📖"}</span>
@@ -1257,7 +1239,7 @@ const DeckDetail = ({ deck, onSave, onClose }) => {
           </div>
         </div>
 
-        <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
+        <div className="deck-modal-body" style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Deck info */}
           <div className="card">
             <div className="form-grid-4" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14 }}>
@@ -1649,8 +1631,8 @@ const AuthScreen = ({ onAuth }) => {
                 onKeyDown={e => e.key === "Enter" && handleSubmit()} />
             </div>
 
-            {error   && <div style={{ fontSize: 13, color: "var(--red2)", background: "rgba(201,76,76,0.08)", border: "1px solid rgba(201,76,76,0.2)", borderRadius: "var(--radius)", padding: "8px 12px" }}>⚠️ {error}</div>}
-            {success && <div style={{ fontSize: 13, color: "var(--green2)", background: "rgba(76,173,111,0.08)", border: "1px solid rgba(76,173,111,0.2)", borderRadius: "var(--radius)", padding: "8px 12px" }}>✓ {success}</div>}
+            {error   && <div style={{ fontSize: 13, color: "var(--red)", background: "#fdeaea", border: "1px solid #f0b0b0", borderRadius: "var(--radius)", padding: "8px 12px" }}>⚠️ {error}</div>}
+            {success && <div style={{ fontSize: 13, color: "var(--green)", background: "#e8f5ee", border: "1px solid #a8d8bc", borderRadius: "var(--radius)", padding: "8px 12px" }}>✓ {success}</div>}
 
             <button className="btn primary" onClick={handleSubmit} disabled={loading}
               style={{ fontSize: 13, padding: "12px", marginTop: 4, opacity: loading ? 0.7 : 1 }}>
@@ -1673,7 +1655,7 @@ const LoadingScreen = ({ error }) => (
     {error ? (
       <>
         <div style={{ fontSize: 36 }}>⚠️</div>
-        <div style={{ fontFamily: "'Cinzel', serif", color: "var(--red2)", fontSize: 14, maxWidth: 400, textAlign: "center" }}>
+        <div style={{ fontFamily: "'Cinzel', serif", color: "var(--red)", fontSize: 14, maxWidth: 400, textAlign: "center" }}>
           Erro ao conectar com o banco de dados.<br />
           <span style={{ fontSize: 12, color: "var(--muted)", marginTop: 8, display: "block" }}>{error}</span>
         </div>
