@@ -198,27 +198,7 @@ const StatCard = ({ label, value, sub, accent = "gold" }) => {
 };
 
 // ─── MOCK DATA ────────────────────────────────────────────────────────────────
-const INITIAL_DECKS = [
-  { id: "d1", name: "Murktide Regent", archetype: "Murktide", format: "Modern", colors: "UR", isOwn: true },
-  { id: "d2", name: "Living End", archetype: "Living End", format: "Modern", colors: "BGU", isOwn: true },
-  { id: "d3", name: "Amulet Titan", archetype: "Amulet", format: "Modern", colors: "GU", isOwn: false },
-  { id: "d4", name: "Hammer Time", archetype: "Hammer Time", format: "Modern", colors: "WU", isOwn: false },
-  { id: "d5", name: "Yawgmoth", archetype: "Yawgmoth", format: "Modern", colors: "BG", isOwn: false },
-  { id: "d6", name: "Burn", archetype: "Burn", format: "Modern", colors: "RWU", isOwn: false },
-  { id: "d7", name: "4/5c Omnath", archetype: "Omnath", format: "Modern", colors: "WURG", isOwn: false },
-  { id: "d8", name: "Cascade Crashers", archetype: "Crashers", format: "Modern", colors: "RGU", isOwn: true },
-];
-
-const INITIAL_MATCHES = [
-  { id: "m1", myDeckId: "d1", oppDeckId: "d3", result: "W", eventName: "FNM GPSP", round: "R1", playedAt: "2025-05-10", notes: "Game 3 apertado, acertei a linha certa", tags: ["bo3"] },
-  { id: "m2", myDeckId: "d1", oppDeckId: "d4", result: "L", eventName: "FNM GPSP", round: "R2", playedAt: "2025-05-10", notes: "Sem respostas no game 1", tags: ["punted"] },
-  { id: "m3", myDeckId: "d2", oppDeckId: "d6", result: "W", eventName: "Regional", round: "R3", playedAt: "2025-05-08", notes: "", tags: ["bo3"] },
-  { id: "m4", myDeckId: "d1", oppDeckId: "d5", result: "W", eventName: "Regional", round: "R1", playedAt: "2025-05-08", notes: "Opp mulliganed para 5", tags: [] },
-  { id: "m5", myDeckId: "d8", oppDeckId: "d7", result: "L", eventName: "Regional", round: "R2", playedAt: "2025-05-08", notes: "Took wrong line g2", tags: ["punted"] },
-  { id: "m6", myDeckId: "d2", oppDeckId: "d3", result: "W", eventName: "FNM GPSP", round: "R1", playedAt: "2025-05-03", notes: "", tags: [] },
-  { id: "m7", myDeckId: "d1", oppDeckId: "d3", result: "W", eventName: "FNM GPSP", round: "R3", playedAt: "2025-05-03", notes: "", tags: [] },
-  { id: "m8", myDeckId: "d8", oppDeckId: "d4", result: "W", eventName: "FNM GPSP", round: "R2", playedAt: "2025-05-03", notes: "", tags: ["on the draw"] },
-];
+// ─── MOCK DATA (removido — dados vêm do Supabase) ────────────────────────────
 
 // ─── HEADER ───────────────────────────────────────────────────────────────────
 const Header = ({ page, setPage }) => (
@@ -725,7 +705,7 @@ const DeckSelect = ({ label, value, onChange, deckList, isOwn, onCreateDeck, pla
 };
 
 // ─── NEW MATCH PAGE ───────────────────────────────────────────────────────────
-const NewMatch = ({ decks, setDecks, onSave }) => {
+const NewMatch = ({ decks, onCreateDeckInline, onSave }) => {
   const [form, setForm] = useState({
     myDeckId: "", oppDeckId: "", result: "W",
     eventName: "", round: "R1", playedAt: new Date().toISOString().split("T")[0],
@@ -738,7 +718,7 @@ const NewMatch = ({ decks, setDecks, onSave }) => {
   const allOppDecks = [...oppDecks, ...ownDecks];
 
   const handleCreateDeck = (newDeck) => {
-    setDecks(prev => [...prev, newDeck]);
+    onCreateDeckInline(newDeck);
   };
 
   const handleSave = () => {
@@ -1234,8 +1214,8 @@ const DeckDetail = ({ deck, onSave, onClose }) => {
 };
 
 // ─── DECKS PAGE ───────────────────────────────────────────────────────────────
-const DecksPage = ({ decks, setDecks }) => {
-  const [editing, setEditing] = useState(null); // deck being edited, or "new"
+const DecksPage = ({ decks, onSaveDeck, onDeleteDeck, onCreateDeck }) => {
+  const [editing, setEditing] = useState(null);
 
   const ownDecks  = decks.filter(d => d.isOwn);
   const metaDecks = decks.filter(d => !d.isOwn);
@@ -1245,18 +1225,14 @@ const DecksPage = ({ decks, setDecks }) => {
     colors: "", isOwn: true, maindeck: [], sideboard: [],
   });
 
-  const handleSave = (updated) => {
-    setDecks(prev => {
-      const exists = prev.find(d => d.id === updated.id);
-      if (exists) return prev.map(d => d.id === updated.id ? updated : d);
-      return [...prev, updated];
-    });
+  const handleSave = async (updated) => {
+    await onSaveDeck(updated);
     setEditing(null);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!confirm("Deletar este deck?")) return;
-    setDecks(prev => prev.filter(d => d.id !== id));
+    await onDeleteDeck(id);
   };
 
   const DeckCard = ({ deck }) => {
@@ -1377,22 +1353,157 @@ const DecksPage = ({ decks, setDecks }) => {
 // little helper to avoid template literal issues
 const var_radius2 = "var(--radius2)";
 
+// ─── SUPABASE CLIENT ──────────────────────────────────────────────────────────
+const SUPABASE_URL = "https://qkkduepkaqrxgfqfbals.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFra2R1ZXBrYXFyeGdmcWZiYWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjE5MTcsImV4cCI6MjA5NDM5NzkxN30.OFcvgwo78fZtYD1K-3X3b6nTX5FERiZfe35f7TY9s-U";
+
+const sb = {
+  headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` },
+  url: (table, qs = "") => `${SUPABASE_URL}/rest/v1/${table}${qs}`,
+  async get(table, qs = "") {
+    const r = await fetch(this.url(table, qs), { headers: { ...this.headers, Prefer: "return=representation" } });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  },
+  async post(table, body) {
+    const r = await fetch(this.url(table), { method: "POST", headers: { ...this.headers, Prefer: "return=representation" }, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  },
+  async patch(table, id, body) {
+    const r = await fetch(this.url(table, `?id=eq.${id}`), { method: "PATCH", headers: { ...this.headers, Prefer: "return=representation" }, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  },
+  async del(table, id) {
+    const r = await fetch(this.url(table, `?id=eq.${id}`), { method: "DELETE", headers: this.headers });
+    if (!r.ok) throw new Error(await r.text());
+  },
+};
+
+// ─── DB HELPERS: convert snake_case ↔ camelCase ──────────────────────────────
+const deckFromDB = (d) => ({
+  id: d.id, name: d.name, archetype: d.archetype, format: d.format,
+  colors: d.colors, isOwn: d.is_own, notes: d.notes || "",
+  maindeck: d.maindeck || [], sideboard: d.sideboard || [],
+});
+const deckToDB = (d) => ({
+  id: d.id, name: d.name, archetype: d.archetype, format: d.format,
+  colors: d.colors, is_own: d.isOwn, notes: d.notes || "",
+  maindeck: d.maindeck || [], sideboard: d.sideboard || [],
+});
+const matchFromDB = (m) => ({
+  id: m.id, myDeckId: m.my_deck_id, oppDeckId: m.opp_deck_id,
+  result: m.result, eventName: m.event_name, round: m.round,
+  playedAt: m.played_at, notes: m.notes || "", tags: m.tags || [],
+});
+const matchToDB = (m) => ({
+  id: m.id, my_deck_id: m.myDeckId, opp_deck_id: m.oppDeckId,
+  result: m.result, event_name: m.eventName, round: m.round,
+  played_at: m.playedAt, notes: m.notes || "", tags: m.tags || [],
+});
+
+// ─── LOADING SCREEN ───────────────────────────────────────────────────────────
+const LoadingScreen = ({ error }) => (
+  <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
+    {error ? (
+      <>
+        <div style={{ fontSize: 36 }}>⚠️</div>
+        <div style={{ fontFamily: "'Cinzel', serif", color: "var(--red2)", fontSize: 14, maxWidth: 400, textAlign: "center" }}>
+          Erro ao conectar com o banco de dados.<br />
+          <span style={{ fontSize: 12, color: "var(--muted)", marginTop: 8, display: "block" }}>{error}</span>
+        </div>
+      </>
+    ) : (
+      <>
+        <div style={{ fontSize: 36, animation: "shimmer 1.2s ease-in-out infinite" }}>⚡</div>
+        <div style={{ fontFamily: "'Cinzel', serif", color: "var(--gold)", fontSize: 13, letterSpacing: "0.12em" }}>
+          CARREGANDO GRIMÓRIO…
+        </div>
+      </>
+    )}
+  </div>
+);
+
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const [page, setPage] = useState("dashboard");
-  const [matches, setMatches] = useState(INITIAL_MATCHES);
-  const [decks, setDecks] = useState(INITIAL_DECKS);
+  const [page, setPage]       = useState("dashboard");
+  const [matches, setMatches] = useState([]);
+  const [decks, setDecks]     = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
 
-  const handleSaveMatch = (data) => {
+  // ── Load all data on mount ──
+  useEffect(() => {
+    (async () => {
+      try {
+        const [dbDecks, dbMatches] = await Promise.all([
+          sb.get("decks", "?order=created_at.asc"),
+          sb.get("matches", "?order=played_at.desc,created_at.desc"),
+        ]);
+        setDecks(dbDecks.map(deckFromDB));
+        setMatches(dbMatches.map(matchFromDB));
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  // ── MATCH handlers ──
+  const handleSaveMatch = async (data) => {
     const newMatch = { id: `m${Date.now()}`, ...data };
-    setMatches(prev => [newMatch, ...prev]);
-    setPage("matches");
+    try {
+      await sb.post("matches", matchToDB(newMatch));
+      setMatches(prev => [newMatch, ...prev]);
+      setPage("matches");
+    } catch (e) { alert("Erro ao salvar partida: " + e.message); }
   };
 
-  const handleDeleteMatch = (id) => {
+  const handleDeleteMatch = async (id) => {
     if (!confirm("Deletar esta partida?")) return;
-    setMatches(prev => prev.filter(m => m.id !== id));
+    try {
+      await sb.del("matches", id);
+      setMatches(prev => prev.filter(m => m.id !== id));
+    } catch (e) { alert("Erro ao deletar: " + e.message); }
   };
+
+  // ── DECK handlers (passed to DecksPage & NewMatch) ──
+  const handleSetDecks = async (updaterOrDeck) => {
+    // Support both setDecks(fn) and setDecks(newArray) patterns
+    // DecksPage calls setDecks(prev => [...]) — we intercept saves/deletes there
+    setDecks(updaterOrDeck);
+  };
+
+  const handleSaveDeck = async (deck) => {
+    const existing = decks.find(d => d.id === deck.id);
+    try {
+      if (existing) {
+        await sb.patch("decks", deck.id, deckToDB(deck));
+        setDecks(prev => prev.map(d => d.id === deck.id ? deck : d));
+      } else {
+        await sb.post("decks", deckToDB(deck));
+        setDecks(prev => [...prev, deck]);
+      }
+    } catch (e) { alert("Erro ao salvar deck: " + e.message); }
+  };
+
+  const handleDeleteDeck = async (id) => {
+    try {
+      await sb.del("decks", id);
+      setDecks(prev => prev.filter(d => d.id !== id));
+    } catch (e) { alert("Erro ao deletar deck: " + e.message); }
+  };
+
+  const handleCreateDeckInline = async (deck) => {
+    try {
+      await sb.post("decks", deckToDB(deck));
+      setDecks(prev => [...prev, deck]);
+    } catch (e) { alert("Erro ao salvar deck: " + e.message); }
+  };
+
+  if (loading || error) return (<><GlobalStyle /><LoadingScreen error={error} /></>);
 
   return (
     <>
@@ -1400,11 +1511,11 @@ export default function App() {
       <Header page={page} setPage={setPage} />
 
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px 60px" }}>
-        {page === "dashboard" && <Dashboard matches={matches} decks={decks} />}
-        {page === "matches" && <MatchesList matches={matches} decks={decks} onDelete={handleDeleteMatch} />}
-        {page === "new" && <NewMatch decks={decks} setDecks={setDecks} onSave={handleSaveMatch} />}
-        {page === "matchups" && <MatchupAnalysis matches={matches} decks={decks} />}
-        {page === "decks" && <DecksPage decks={decks} setDecks={setDecks} />}
+        {page === "dashboard"  && <Dashboard matches={matches} decks={decks} />}
+        {page === "matches"    && <MatchesList matches={matches} decks={decks} onDelete={handleDeleteMatch} />}
+        {page === "new"        && <NewMatch decks={decks} onCreateDeckInline={handleCreateDeckInline} onSave={handleSaveMatch} />}
+        {page === "matchups"   && <MatchupAnalysis matches={matches} decks={decks} />}
+        {page === "decks"      && <DecksPage decks={decks} onSaveDeck={handleSaveDeck} onDeleteDeck={handleDeleteDeck} onCreateDeck={handleCreateDeckInline} />}
       </main>
 
       <footer style={{ borderTop: "1px solid var(--border)", padding: "16px 24px", textAlign: "center" }}>
