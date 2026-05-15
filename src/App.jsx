@@ -201,7 +201,7 @@ const StatCard = ({ label, value, sub, accent = "gold" }) => {
 // ─── MOCK DATA (removido — dados vêm do Supabase) ────────────────────────────
 
 // ─── HEADER ───────────────────────────────────────────────────────────────────
-const Header = ({ page, setPage }) => (
+const Header = ({ page, setPage, user, onLogout }) => (
   <header style={{
     borderBottom: "1px solid var(--border)",
     background: "rgba(10,12,16,0.95)",
@@ -227,6 +227,19 @@ const Header = ({ page, setPage }) => (
             <div style={{ fontFamily: "'Crimson Pro', serif", fontSize: 11, color: "var(--muted)", letterSpacing: "0.12em", textTransform: "uppercase" }}>Match Tracker</div>
           </div>
         </div>
+
+        {/* User info + logout */}
+        {user && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 11, color: "var(--gold)", letterSpacing: "0.06em" }}>
+                {user.email.split("@")[0]}
+              </div>
+              <div style={{ fontSize: 10, color: "var(--muted)" }}>{user.email}</div>
+            </div>
+            <button className="btn sm danger" onClick={onLogout} style={{ fontSize: 10 }}>Sair</button>
+          </div>
+        )}
       </div>
 
       {/* Nav tabs */}
@@ -1358,8 +1371,47 @@ const SUPABASE_URL = "https://qkkduepkaqrxgfqfbals.supabase.co";
 const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFra2R1ZXBrYXFyeGdmcWZiYWxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjE5MTcsImV4cCI6MjA5NDM5NzkxN30.OFcvgwo78fZtYD1K-3X3b6nTX5FERiZfe35f7TY9s-U";
 
 const sb = {
-  headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` },
+  _token: null,
+  get headers() {
+    return {
+      "Content-Type": "application/json",
+      apikey: SUPABASE_ANON,
+      Authorization: `Bearer ${this._token || SUPABASE_ANON}`,
+    };
+  },
   url: (table, qs = "") => `${SUPABASE_URL}/rest/v1/${table}${qs}`,
+  authUrl: (path) => `${SUPABASE_URL}/auth/v1/${path}`,
+
+  // ── Auth ──
+  async signUp(email, password) {
+    const r = await fetch(this.authUrl("signup"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.msg || data.error_description || "Erro no cadastro");
+    return data;
+  },
+  async signIn(email, password) {
+    const r = await fetch(this.authUrl("token?grant_type=password"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error_description || data.msg || "Credenciais inválidas");
+    this._token = data.access_token;
+    return data;
+  },
+  async signOut() {
+    await fetch(this.authUrl("logout"), {
+      method: "POST", headers: this.headers,
+    });
+    this._token = null;
+  },
+
+  // ── Data ──
   async get(table, qs = "") {
     const r = await fetch(this.url(table, qs), { headers: { ...this.headers, Prefer: "return=representation" } });
     if (!r.ok) throw new Error(await r.text());
@@ -1387,21 +1439,123 @@ const deckFromDB = (d) => ({
   colors: d.colors, isOwn: d.is_own, notes: d.notes || "",
   maindeck: d.maindeck || [], sideboard: d.sideboard || [],
 });
-const deckToDB = (d) => ({
+const deckToDB = (d, userId) => ({
   id: d.id, name: d.name, archetype: d.archetype, format: d.format,
   colors: d.colors, is_own: d.isOwn, notes: d.notes || "",
   maindeck: d.maindeck || [], sideboard: d.sideboard || [],
+  ...(userId ? { user_id: userId } : {}),
 });
 const matchFromDB = (m) => ({
   id: m.id, myDeckId: m.my_deck_id, oppDeckId: m.opp_deck_id,
   result: m.result, eventName: m.event_name, round: m.round,
   playedAt: m.played_at, notes: m.notes || "", tags: m.tags || [],
 });
-const matchToDB = (m) => ({
+const matchToDB = (m, userId) => ({
   id: m.id, my_deck_id: m.myDeckId, opp_deck_id: m.oppDeckId,
   result: m.result, event_name: m.eventName, round: m.round,
   played_at: m.playedAt, notes: m.notes || "", tags: m.tags || [],
+  ...(userId ? { user_id: userId } : {}),
 });
+
+// ─── LOGIN / CADASTRO SCREEN ──────────────────────────────────────────────────
+const AuthScreen = ({ onAuth }) => {
+  const [mode, setMode]       = useState("login"); // "login" | "signup"
+  const [email, setEmail]     = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleSubmit = async () => {
+    if (!email || !password) { setError("Preencha email e senha."); return; }
+    setLoading(true); setError(""); setSuccess("");
+    try {
+      if (mode === "signup") {
+        await sb.signUp(email, password);
+        setSuccess("Conta criada! Verifique seu e-mail para confirmar o cadastro, depois faça login.");
+        setMode("login");
+      } else {
+        const data = await sb.signIn(email, password);
+        onAuth({ id: data.user.id, email: data.user.email });
+      }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "24px",
+    }}>
+      <div style={{ width: "100%", maxWidth: 400 }}>
+        {/* Logo */}
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <svg width="52" height="52" viewBox="0 0 36 36" style={{ margin: "0 auto 12px", display: "block" }}>
+            <defs>
+              <radialGradient id="lg2" cx="50%" cy="30%">
+                <stop offset="0%" stopColor="#f5dfa0"/>
+                <stop offset="100%" stopColor="#8a5a1a"/>
+              </radialGradient>
+            </defs>
+            <circle cx="18" cy="18" r="17" fill="url(#lg2)" stroke="rgba(201,168,76,0.5)" strokeWidth="1"/>
+            <text x="18" y="25" textAnchor="middle" fontSize="18" fontFamily="serif" fill="#0a0c10">⚡</text>
+          </svg>
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: 22, fontWeight: 900, color: "var(--gold2)", letterSpacing: "0.1em" }}>TEAM GRAPESHOT</div>
+          <div style={{ fontFamily: "'Crimson Pro', serif", fontSize: 12, color: "var(--muted)", letterSpacing: "0.14em", textTransform: "uppercase", marginTop: 4 }}>Match Tracker</div>
+        </div>
+
+        {/* Card */}
+        <div className="card" style={{ padding: "28px 32px" }}>
+          {/* Mode toggle */}
+          <div style={{ display: "flex", marginBottom: 24, borderRadius: "var(--radius)", overflow: "hidden", border: "1px solid var(--border)" }}>
+            {["login", "signup"].map(m => (
+              <button key={m} onClick={() => { setMode(m); setError(""); setSuccess(""); }} style={{
+                flex: 1, padding: "9px 0",
+                fontFamily: "'Cinzel', serif", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase",
+                background: mode === m ? "rgba(201,168,76,0.12)" : "transparent",
+                color: mode === m ? "var(--gold2)" : "var(--muted)",
+                border: "none", borderRight: m === "login" ? "1px solid var(--border)" : "none",
+                cursor: "pointer", transition: "all 0.2s",
+              }}>
+                {m === "login" ? "Entrar" : "Criar conta"}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div>
+              <label>E-mail</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="seu@email.com"
+                onKeyDown={e => e.key === "Enter" && handleSubmit()} />
+            </div>
+            <div>
+              <label>Senha {mode === "signup" && <span style={{ color: "var(--muted)", fontSize: 10 }}>(mín. 6 caracteres)</span>}</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                onKeyDown={e => e.key === "Enter" && handleSubmit()} />
+            </div>
+
+            {error   && <div style={{ fontSize: 13, color: "var(--red2)", background: "rgba(201,76,76,0.08)", border: "1px solid rgba(201,76,76,0.2)", borderRadius: "var(--radius)", padding: "8px 12px" }}>⚠️ {error}</div>}
+            {success && <div style={{ fontSize: 13, color: "var(--green2)", background: "rgba(76,173,111,0.08)", border: "1px solid rgba(76,173,111,0.2)", borderRadius: "var(--radius)", padding: "8px 12px" }}>✓ {success}</div>}
+
+            <button className="btn primary" onClick={handleSubmit} disabled={loading}
+              style={{ fontSize: 13, padding: "12px", marginTop: 4, opacity: loading ? 0.7 : 1 }}>
+              {loading ? "Aguarde…" : mode === "login" ? "⚡ Entrar no Grimório" : "✦ Criar Conta"}
+            </button>
+          </div>
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 16, fontSize: 12, color: "var(--muted)" }}>
+          Acesso exclusivo — Team Grapeshot
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // ─── LOADING SCREEN ───────────────────────────────────────────────────────────
 const LoadingScreen = ({ error }) => (
@@ -1428,34 +1582,45 @@ const LoadingScreen = ({ error }) => (
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [page, setPage]       = useState("dashboard");
+  const [user, setUser]       = useState(null);      // { id, email }
   const [matches, setMatches] = useState([]);
   const [decks, setDecks]     = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
 
-  // ── Load all data on mount ──
-  useEffect(() => {
-    (async () => {
-      try {
-        const [dbDecks, dbMatches] = await Promise.all([
-          sb.get("decks", "?order=created_at.asc"),
-          sb.get("matches", "?order=played_at.desc,created_at.desc"),
-        ]);
-        setDecks(dbDecks.map(deckFromDB));
-        setMatches(dbMatches.map(matchFromDB));
-      } catch (e) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  // ── Load data after login ──
+  const loadData = async (userId) => {
+    setLoading(true); setError(null);
+    try {
+      // Meta decks: todos veem (is_own=false). Decks próprios: filtrados por user_id.
+      const [dbDecks, dbMatches] = await Promise.all([
+        sb.get("decks", `?or=(is_own.eq.false,user_id.eq.${userId})&order=created_at.asc`),
+        sb.get("matches", `?user_id=eq.${userId}&order=played_at.desc,created_at.desc`),
+      ]);
+      setDecks(dbDecks.map(deckFromDB));
+      setMatches(dbMatches.map(matchFromDB));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAuth = (userData) => {
+    setUser(userData);
+    loadData(userData.id);
+  };
+
+  const handleLogout = async () => {
+    await sb.signOut();
+    setUser(null); setMatches([]); setDecks([]); setPage("dashboard");
+  };
 
   // ── MATCH handlers ──
   const handleSaveMatch = async (data) => {
     const newMatch = { id: `m${Date.now()}`, ...data };
     try {
-      await sb.post("matches", matchToDB(newMatch));
+      await sb.post("matches", matchToDB(newMatch, user.id));
       setMatches(prev => [newMatch, ...prev]);
       setPage("matches");
     } catch (e) { alert("Erro ao salvar partida: " + e.message); }
@@ -1469,13 +1634,7 @@ export default function App() {
     } catch (e) { alert("Erro ao deletar: " + e.message); }
   };
 
-  // ── DECK handlers (passed to DecksPage & NewMatch) ──
-  const handleSetDecks = async (updaterOrDeck) => {
-    // Support both setDecks(fn) and setDecks(newArray) patterns
-    // DecksPage calls setDecks(prev => [...]) — we intercept saves/deletes there
-    setDecks(updaterOrDeck);
-  };
-
+  // ── DECK handlers ──
   const handleSaveDeck = async (deck) => {
     const existing = decks.find(d => d.id === deck.id);
     try {
@@ -1483,7 +1642,7 @@ export default function App() {
         await sb.patch("decks", deck.id, deckToDB(deck));
         setDecks(prev => prev.map(d => d.id === deck.id ? deck : d));
       } else {
-        await sb.post("decks", deckToDB(deck));
+        await sb.post("decks", deckToDB(deck, user.id));
         setDecks(prev => [...prev, deck]);
       }
     } catch (e) { alert("Erro ao salvar deck: " + e.message); }
@@ -1498,17 +1657,20 @@ export default function App() {
 
   const handleCreateDeckInline = async (deck) => {
     try {
-      await sb.post("decks", deckToDB(deck));
+      await sb.post("decks", deckToDB(deck, user.id));
       setDecks(prev => [...prev, deck]);
     } catch (e) { alert("Erro ao salvar deck: " + e.message); }
   };
+
+  // ── Not logged in ──
+  if (!user) return (<><GlobalStyle /><AuthScreen onAuth={handleAuth} /></>);
 
   if (loading || error) return (<><GlobalStyle /><LoadingScreen error={error} /></>);
 
   return (
     <>
       <GlobalStyle />
-      <Header page={page} setPage={setPage} />
+      <Header page={page} setPage={setPage} user={user} onLogout={handleLogout} />
 
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px 60px" }}>
         {page === "dashboard"  && <Dashboard matches={matches} decks={decks} />}
