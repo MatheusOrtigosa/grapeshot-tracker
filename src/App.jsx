@@ -3,232 +3,235 @@ import { useState, useEffect, useMemo } from "react";
 // ─── THEME & GLOBAL STYLES ────────────────────────────────────────────────────
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #f5f0e8;
-      --bg2:       #fffdf8;
-      --bg3:       #ede8de;
-      --surface:   #ffffff;
-      --surface2:  #faf7f2;
-      --border:    rgba(120,90,30,0.14);
-      --border2:   rgba(120,90,30,0.28);
-      --gold:      #8a6420;
-      --gold2:     #6b4e18;
-      --gold3:     #c9a84c;
-      --red:       #b33a3a;
-      --red2:      #922e2e;
-      --green:     #2e7d4f;
-      --green2:    #1e5c39;
-      --blue:      #2a5f9e;
-      --blue2:     #1d4a80;
-      --purple:    #5c3d9e;
-      --muted:     #8a7e6a;
-      --text:      #2c2416;
-      --text2:     #5c5040;
-      --white:     #2c2416;
-      --radius:    10px;
-      --radius2:   16px;
-      --shadow:    0 2px 16px rgba(120,90,30,0.1);
-      --shadow2:   0 8px 40px rgba(120,90,30,0.15);
+      --bg:        #0d0d0d;
+      --bg2:       #141414;
+      --bg3:       #1a1a1a;
+      --surface:   #181818;
+      --surface2:  #202020;
+      --border:    rgba(230,160,30,0.12);
+      --border2:   rgba(230,160,30,0.28);
+      --orange:    #e6a01e;
+      --orange2:   #f5b832;
+      --orange3:   #ffd060;
+      --orangeGlow:rgba(230,160,30,0.18);
+      --red:       #e05050;
+      --red2:      #ff7070;
+      --green:     #3dbe72;
+      --green2:    #5ddaa0;
+      --blue:      #4a90d9;
+      --blue2:     #6aaff5;
+      --muted:     #666;
+      --text:      #e8e0d0;
+      --text2:     #a09888;
+      --white:     #ffffff;
+      --radius:    12px;
+      --radius2:   18px;
+      --shadow:    0 4px 24px rgba(0,0,0,0.6);
+      --shadow2:   0 12px 60px rgba(0,0,0,0.8);
+      --glow:      0 0 30px rgba(230,160,30,0.2);
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 16px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
+    /* Grapeshot logo watermark + radial glow */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
-        radial-gradient(ellipse 70% 50% at 50% -5%, rgba(201,168,76,0.12) 0%, transparent 65%),
-        radial-gradient(ellipse 40% 40% at 90% 90%, rgba(138,100,32,0.06) 0%, transparent 60%),
-        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%238a6420' fill-opacity='0.04'%3E%3Cpath d='M30 0l30 30-30 30L0 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        radial-gradient(ellipse 60% 50% at 50% 0%, rgba(230,160,30,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 30% at 95% 95%, rgba(230,160,30,0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* SVG logo watermark via pseudo on #root */
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -60px;
+      right: -60px;
+      width: 340px;
+      height: 340px;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='100' cy='100' r='95' fill='none' stroke='%23e6a01e' stroke-width='8'/%3E%3Ccircle cx='100' cy='85' r='22' fill='%23e6a01e'/%3E%3Ccircle cx='72' cy='105' r='20' fill='%23e6a01e'/%3E%3Ccircle cx='128' cy='105' r='20' fill='%23e6a01e'/%3E%3Ccircle cx='82' cy='132' r='19' fill='%23e6a01e'/%3E%3Ccircle cx='118' cy='132' r='19' fill='%23e6a01e'/%3E%3Ccircle cx='100' cy='152' r='18' fill='%23e6a01e'/%3E%3Cpath d='M95 62 Q100 45 110 55' stroke='%23e6a01e' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
       pointer-events: none;
       z-index: 0;
     }
 
     #root { position: relative; z-index: 1; }
 
-    h1, h2, h3, h4 { font-family: 'Cinzel', serif; font-weight: 600; color: var(--text); letter-spacing: 0.04em; }
+    h1, h2, h3, h4 {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.03em;
+    }
 
     .btn {
-      font-family: 'Cinzel', serif;
-      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
       font-weight: 600;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.04em;
       border: 1px solid var(--border2);
       background: transparent;
-      color: var(--gold);
-      padding: 8px 18px;
+      color: var(--orange);
+      padding: 9px 20px;
       border-radius: var(--radius);
       cursor: pointer;
       transition: all 0.18s;
-      text-transform: uppercase;
       white-space: nowrap;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
     }
-    .btn:hover { background: rgba(138,100,32,0.08); border-color: var(--gold); color: var(--gold2); }
+    .btn:hover { background: var(--orangeGlow); border-color: var(--orange); color: var(--orange2); box-shadow: var(--glow); }
     .btn:active { transform: scale(0.97); }
     .btn.primary {
-      background: linear-gradient(135deg, #8a6420, #c9a84c);
-      border-color: #c9a84c;
-      color: #fff;
+      background: linear-gradient(135deg, #c8870a, #e6a01e);
+      border-color: var(--orange2);
+      color: #0d0d0d;
+      font-weight: 700;
     }
-    .btn.primary:hover { background: linear-gradient(135deg, #7a5618, #b8942a); }
-    .btn.danger { border-color: rgba(179,58,58,0.35); color: var(--red); }
-    .btn.danger:hover { background: rgba(179,58,58,0.07); border-color: var(--red); }
-    .btn.sm { font-size: 10px; padding: 5px 12px; }
+    .btn.primary:hover { background: linear-gradient(135deg, #e6a01e, #f5b832); box-shadow: 0 0 20px rgba(230,160,30,0.3); }
+    .btn.danger { border-color: rgba(224,80,80,0.35); color: var(--red2); }
+    .btn.danger:hover { background: rgba(224,80,80,0.1); border-color: var(--red2); }
+    .btn.sm { font-size: 11px; padding: 5px 13px; }
 
     input, select, textarea {
       background: var(--bg2);
       border: 1px solid var(--border2);
       border-radius: var(--radius);
       color: var(--text);
-      font-family: 'Crimson Pro', serif;
-      font-size: 16px;
-      padding: 10px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      padding: 11px 14px;
       width: 100%;
       transition: border-color 0.18s, box-shadow 0.18s;
       outline: none;
       -webkit-appearance: none;
     }
     input:focus, select:focus, textarea:focus {
-      border-color: var(--gold3);
-      box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(230,160,30,0.12);
     }
-    input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
     select option { background: var(--bg2); color: var(--text); }
 
     label {
-      font-size: 11px; font-family: 'Cinzel', serif;
-      letter-spacing: 0.07em; color: var(--gold);
-      text-transform: uppercase; display: block; margin-bottom: 6px; font-weight: 600;
+      font-size: 11px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--orange);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 6px;
     }
 
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius2);
-      padding: 20px;
+      padding: 22px;
       position: relative;
       overflow: hidden;
       box-shadow: var(--shadow);
+      transition: border-color 0.2s;
     }
     .card::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(230,160,30,0.5), transparent);
     }
 
     .badge {
       display: inline-flex; align-items: center; gap: 4px;
-      font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
-      letter-spacing: 0.07em; padding: 3px 10px;
+      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.05em; padding: 4px 12px;
       border-radius: 20px; text-transform: uppercase;
     }
-    .badge.win  { background: #e8f5ee; color: #1e6b40; border: 1px solid #a8d8bc; }
-    .badge.loss { background: #fdeaea; color: #8b2020; border: 1px solid #f0b0b0; }
-    .badge.draw { background: #f0ece4; color: #7a6e5c; border: 1px solid #ccc4b0; }
+    .badge.win  { background: rgba(61,190,114,0.12); color: var(--green2); border: 1px solid rgba(61,190,114,0.3); }
+    .badge.loss { background: rgba(224,80,80,0.12);  color: var(--red2);   border: 1px solid rgba(224,80,80,0.3); }
+    .badge.draw { background: rgba(102,102,102,0.15); color: var(--muted); border: 1px solid rgba(102,102,102,0.3); }
 
     .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border2), transparent); margin: 20px 0; }
 
     ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--bg3); }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(230,160,30,0.25); border-radius: 3px; }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-    @keyframes shimmer { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes shimmer { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+    @keyframes glowPulse { 0%,100% { box-shadow: 0 0 20px rgba(230,160,30,0.1); } 50% { box-shadow: 0 0 40px rgba(230,160,30,0.25); } }
     .fade-in { animation: fadeIn 0.3s ease both; }
 
     /* ── MOBILE ─────────────────────────────────────────────────────────────── */
     @media (max-width: 640px) {
-
       .mobile-nav {
         position: fixed;
         bottom: 0; left: 0; right: 0; z-index: 200;
-        background: rgba(255,253,248,0.97);
-        backdrop-filter: blur(16px);
+        background: rgba(18,18,18,0.97);
+        backdrop-filter: blur(20px);
         border-top: 1px solid var(--border2);
         display: flex;
         padding: 6px 0 max(6px, env(safe-area-inset-bottom));
-        box-shadow: 0 -2px 16px rgba(120,90,30,0.08);
+        box-shadow: 0 -4px 30px rgba(0,0,0,0.5);
       }
       .mobile-nav button {
         flex: 1; display: flex; flex-direction: column;
-        align-items: center; gap: 2px; padding: 6px 4px;
+        align-items: center; gap: 3px; padding: 6px 4px;
         background: none; border: none; cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
       }
-      .mobile-nav .nav-icon { font-size: 20px; line-height: 1; }
+      .mobile-nav .nav-icon { font-size: 21px; line-height: 1; }
       .mobile-nav .nav-label {
-        font-family: 'Cinzel', serif; font-size: 8px;
+        font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 600;
         letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
       }
-      .mobile-nav button.active .nav-label { color: var(--gold); font-weight: 700; }
+      .mobile-nav button.active .nav-label { color: var(--orange2); }
+      .mobile-nav button.active .nav-icon { filter: drop-shadow(0 0 5px rgba(230,160,30,0.6)); }
 
-      .main-mobile { padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important; }
-
+      .main-mobile { padding-bottom: calc(82px + env(safe-area-inset-bottom)) !important; }
       .header-logo-text { display: none; }
       .header-subtitle   { display: none; }
       .header-top { padding: 10px 0 8px !important; }
       .header-top-inner { padding: 0 16px !important; }
-
       .card { padding: 14px; }
-
       .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
       .grid-decks { grid-template-columns: 1fr !important; }
-
-      .hero-wr { font-size: 38px !important; }
-
+      .hero-wr { font-size: 40px !important; }
       .form-grid-2 { grid-template-columns: 1fr !important; }
       .form-grid-3 { grid-template-columns: 1fr 1fr !important; }
       .form-grid-4 { grid-template-columns: 1fr 1fr !important; }
-
       .mu-col-hide { display: none !important; }
-
-      /* Modal tela cheia corrigido */
-      .deck-modal-wrap {
-        padding: 0 !important;
-        align-items: stretch !important;
-        overflow-y: auto;
-      }
-      .deck-modal-inner {
-        max-width: 100% !important;
-        width: 100% !important;
-        border-radius: 0 !important;
-        min-height: 100dvh;
-        display: flex;
-        flex-direction: column;
-      }
-      .deck-modal-body {
-        flex: 1;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-
+      .deck-modal-wrap { padding: 0 !important; align-items: stretch !important; overflow-y: auto; }
+      .deck-modal-inner { max-width: 100% !important; width: 100% !important; border-radius: 0 !important; min-height: 100dvh; display: flex; flex-direction: column; }
+      .deck-modal-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
       .inline-deck-grid { grid-template-columns: 1fr !important; }
       .filter-bar { flex-wrap: wrap !important; gap: 8px !important; }
-      .filter-bar select { font-size: 12px !important; }
+      .filter-bar select { font-size: 13px !important; }
       .match-card-inner { flex-wrap: wrap !important; gap: 8px !important; }
       .user-email-full { display: none !important; }
-
-      /* Desktop nav escondida no mobile */
       .desktop-nav { display: none !important; }
     }
 
-    /* Desktop: bottom nav escondida */
     @media (min-width: 641px) {
       .mobile-nav { display: none !important; }
       .desktop-nav { display: flex !important; }
@@ -266,7 +269,7 @@ const ManaRow = ({ colors = "" }) => (
 
 // ─── STAT CARD ────────────────────────────────────────────────────────────────
 const StatCard = ({ label, value, sub, accent = "gold" }) => {
-  const accentColor = { gold: "var(--gold)", green: "var(--green2)", red: "var(--red2)", blue: "var(--blue2)" }[accent];
+  const accentColor = { gold: "var(--orange)", green: "var(--green2)", red: "var(--red2)", blue: "var(--blue2)" }[accent];
   return (
     <div className="card" style={{ textAlign: "center", padding: "18px 14px" }}>
       <div style={{ fontSize: 28, fontFamily: "'Cinzel', serif", fontWeight: 700, color: accentColor, lineHeight: 1 }}>{value}</div>
@@ -292,9 +295,9 @@ const Header = ({ page, setPage, user, onLogout }) => {
   return (
   <>
     <header style={{
-      borderBottom: "1px solid var(--border)",
-      background: "rgba(245,240,232,0.96)",
-      backdropFilter: "blur(12px)",
+      borderBottom: "1px solid var(--border2)",
+      background: "rgba(13,13,13,0.95)",
+      backdropFilter: "blur(16px)",
       position: "sticky", top: 0, zIndex: 100,
     }}>
       <div className="header-top-inner" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
@@ -312,8 +315,8 @@ const Header = ({ page, setPage, user, onLogout }) => {
               <text x="18" y="25" textAnchor="middle" fontSize="18" fontFamily="serif" fill="#2c2416">⚡</text>
             </svg>
             <div>
-              <div className="header-logo-text" style={{ fontFamily: "'Cinzel', serif", fontSize: 18, fontWeight: 900, color: "var(--gold)", letterSpacing: "0.1em", lineHeight: 1 }}>TEAM GRAPESHOT</div>
-              <div className="header-subtitle" style={{ fontFamily: "'Crimson Pro', serif", fontSize: 11, color: "var(--muted)", letterSpacing: "0.12em", textTransform: "uppercase" }}>Match Tracker</div>
+              <div className="header-logo-text" style={{ fontFamily: "'Cinzel', serif", fontSize: 18, fontWeight: 900, color: "var(--orange2)", letterSpacing: "0.1em", lineHeight: 1 }}>TEAM GRAPESHOT</div>
+              <div className="header-subtitle" style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 500, color: "var(--muted)", letterSpacing: "0.18em", textTransform: "uppercase" }}>Match Tracker</div>
             </div>
           </div>
 
@@ -336,12 +339,13 @@ const Header = ({ page, setPage, user, onLogout }) => {
             <button key={tab.key} onClick={() => setPage(tab.key)} style={{
               fontFamily: "'Cinzel', serif", fontSize: 11, letterSpacing: "0.07em",
               background: "none", border: "none", cursor: "pointer",
-              color: page === tab.key ? "var(--gold)" : "var(--muted)",
-              padding: "8px 16px",
-              borderBottom: page === tab.key ? `2px solid var(--gold3)` : "2px solid transparent",
+              color: page === tab.key ? "var(--orange2)" : "var(--muted)",
+              padding: "9px 16px",
+              borderBottom: page === tab.key ? `2px solid var(--orange)` : "2px solid transparent",
               transition: "all 0.2s",
-              fontWeight: page === tab.key ? 700 : 400,
-              touchAction: "manipulation",
+              fontWeight: page === tab.key ? 600 : 400,
+              fontSize: 13,
+              fontFamily: "'Inter', sans-serif",
             }}>
               {tab.icon} {tab.label}
             </button>
@@ -546,20 +550,20 @@ const Dashboard = ({ matches, decks }) => {
 
       {/* ── HERO BANNER ── */}
       <div style={{
-        background: "linear-gradient(135deg, #fffdf8 0%, #f5ead8 100%)",
+        background: "linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)",
         border: "1px solid var(--border)",
         borderRadius: var_radius2,
         padding: "28px 32px",
         position: "relative",
         overflow: "hidden",
       }}>
-        <div style={{ position: "absolute", top: -20, right: -20, fontSize: 120, opacity: 0.05, fontFamily: "serif", lineHeight: 1, color: "#8a6420" }}>⚡</div>
+        <div style={{ position: "absolute", top: -20, right: -20, fontSize: 120, opacity: 0.04, fontFamily: "serif", lineHeight: 1, color: "var(--orange)" }}>🍇</div>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, var(--gold), transparent)", opacity: 0.3 }} />
         <div style={{ fontFamily: "'Cinzel', serif", fontSize: 11, letterSpacing: "0.12em", color: "var(--muted)", textTransform: "uppercase", marginBottom: 8 }}>
           {hasFilter ? "Performance Filtrada" : "Performance Geral"}
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 16, flexWrap: "wrap" }}>
-          <div className="hero-wr" style={{ fontFamily: "'Cinzel', serif", fontSize: 52, fontWeight: 900, color: winRate >= 50 ? "var(--green2)" : "var(--red2)", lineHeight: 1 }}>
+          <div className="hero-wr" style={{ fontFamily: "'Inter', sans-serif", fontSize: 56, fontWeight: 800, color: winRate >= 50 ? "var(--green2)" : "var(--red2)", lineHeight: 1 }}>
             {filtered.length ? winRate : "—"}<span style={{ fontSize: 22, color: "var(--muted)" }}>{filtered.length ? "%" : ""}</span>
           </div>
           <div>
@@ -1209,7 +1213,7 @@ const DeckDetail = ({ deck, onSave, onClose }) => {
   return (
     <div className="deck-modal-wrap" style={{
       position: "fixed", inset: 0, zIndex: 200,
-      background: "rgba(120,90,30,0.4)", backdropFilter: "blur(6px)",
+      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)",
       display: "flex", alignItems: "flex-start", justifyContent: "center",
       padding: "24px 16px", overflowY: "auto",
     }}>
@@ -1224,12 +1228,12 @@ const DeckDetail = ({ deck, onSave, onClose }) => {
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "18px 24px", borderBottom: "1px solid var(--border)",
-          background: "var(--surface2)",
+          background: "var(--bg2)",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 22 }}>{isOwn ? "🃏" : "📖"}</span>
             <div>
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 16, color: isOwn ? "var(--gold2)" : "var(--muted)", fontWeight: 700 }}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 16, color: isOwn ? "var(--orange2)" : "var(--muted)", fontWeight: 700 }}>
                 {info.name || (isOwn ? "Novo Deck" : "Deck do Meta")}
               </div>
               <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>
@@ -1599,8 +1603,8 @@ const AuthScreen = ({ onAuth }) => {
             <circle cx="18" cy="18" r="17" fill="url(#lg2)" stroke="rgba(201,168,76,0.5)" strokeWidth="1"/>
             <text x="18" y="25" textAnchor="middle" fontSize="18" fontFamily="serif" fill="#0a0c10">⚡</text>
           </svg>
-          <div style={{ fontFamily: "'Cinzel', serif", fontSize: 22, fontWeight: 900, color: "var(--gold2)", letterSpacing: "0.1em" }}>TEAM GRAPESHOT</div>
-          <div style={{ fontFamily: "'Crimson Pro', serif", fontSize: 12, color: "var(--muted)", letterSpacing: "0.14em", textTransform: "uppercase", marginTop: 4 }}>Match Tracker</div>
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: 24, fontWeight: 900, color: "var(--orange2)", letterSpacing: "0.1em" }}>TEAM GRAPESHOT</div>
+          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 500, color: "var(--muted)", letterSpacing: "0.18em", textTransform: "uppercase", marginTop: 4 }}>Match Tracker</div>
         </div>
 
         {/* Card */}
