@@ -764,7 +764,7 @@ const InlineDeckForm = ({ isOwn, onSave, onCancel }) => {
         <div>
           <label>Formato</label>
           <select value={df.format} onChange={e => setDf(f => ({ ...f, format: e.target.value }))}>
-            {["Modern","Legacy","Pioneer","Standard","Vintage","Limited"].map(x => <option key={x}>{x}</option>)}
+            {["Modern","Legacy","Pioneer","Standard","Pauper","Vintage","Limited"].map(x => <option key={x}>{x}</option>)}
           </select>
         </div>
         <div>
@@ -1262,7 +1262,7 @@ const DeckDetail = ({ deck, onSave, onClose }) => {
               <div>
                 <label>Formato</label>
                 <select value={info.format} onChange={e => setInfo(i => ({ ...i, format: e.target.value }))}>
-                  {["Modern","Legacy","Pioneer","Standard","Vintage","Limited"].map(f => <option key={f}>{f}</option>)}
+                  {["Modern","Legacy","Pioneer","Standard","Pauper","Vintage","Limited"].map(f => <option key={f}>{f}</option>)}
                 </select>
               </div>
               <div>
@@ -1415,7 +1415,7 @@ const DecksPage = ({ decks, onSaveDeck, onDeleteDeck, onCreateDeck }) => {
     );
   };
 
-  const FORMATS = ["Todos", "Modern", "Legacy", "Pioneer", "Standard", "Vintage", "Limited"];
+  const FORMATS = ["Todos", "Modern", "Legacy", "Pioneer", "Standard", "Pauper", "Vintage", "Limited"];
 
   const allFormats = ["Todos", ...Array.from(new Set(decks.map(d => d.format).filter(Boolean))).sort()];
   const [activeFormat, setActiveFormat] = useState("Todos");
