@@ -25,9 +25,9 @@ const GlobalStyle = () => (
       --green2:    #5ddaa0;
       --blue:      #4a90d9;
       --blue2:     #6aaff5;
-      --muted:     #666;
-      --text:      #e8e0d0;
-      --text2:     #a09888;
+      --muted:     #8a8a8a;
+      --text:      #f0e8d8;
+      --text2:     #c0b090;
       --white:     #ffffff;
       --radius:    12px;
       --radius2:   18px;
@@ -1415,47 +1415,72 @@ const DecksPage = ({ decks, onSaveDeck, onDeleteDeck, onCreateDeck }) => {
     );
   };
 
+  const FORMATS = ["Todos", "Modern", "Legacy", "Pioneer", "Standard", "Vintage", "Limited"];
+
+  const allFormats = ["Todos", ...Array.from(new Set(decks.map(d => d.format).filter(Boolean))).sort()];
+  const [activeFormat, setActiveFormat] = useState("Todos");
+
+  const filteredOwn  = ownDecks.filter(d => activeFormat === "Todos" || d.format === activeFormat);
+  const filteredMeta = metaDecks.filter(d => activeFormat === "Todos" || d.format === activeFormat);
+
   return (
     <div className="fade-in" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {editing && (
-        <DeckDetail
-          deck={editing}
-          onSave={handleSave}
-          onClose={() => setEditing(null)}
-        />
+        <DeckDetail deck={editing} onSave={handleSave} onClose={() => setEditing(null)} />
       )}
 
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      {/* Header row */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+        <h2 style={{ fontSize: 18, color: "var(--orange2)" }}>Decks</h2>
         <button className="btn primary" onClick={openNew}>+ Novo Deck</button>
       </div>
 
+      {/* Format tabs */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        {allFormats.map(fmt => (
+          <button key={fmt} onClick={() => setActiveFormat(fmt)} style={{
+            fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 600,
+            letterSpacing: "0.05em", padding: "6px 16px", borderRadius: 20,
+            border: activeFormat === fmt ? "1px solid var(--orange)" : "1px solid var(--border2)",
+            background: activeFormat === fmt ? "var(--orangeGlow)" : "transparent",
+            color: activeFormat === fmt ? "var(--orange2)" : "var(--muted)",
+            cursor: "pointer", transition: "all 0.18s",
+            touchAction: "manipulation",
+          }}>{fmt}</button>
+        ))}
+      </div>
+
+      {/* Meus Decks */}
       <div>
-        <h3 style={{ fontSize: 14, color: "var(--gold)", marginBottom: 12, fontFamily: "'Cinzel', serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          🃏 Meus Decks ({ownDecks.length})
+        <h3 style={{ fontSize: 13, color: "var(--orange)", marginBottom: 12, fontFamily: "'Cinzel', serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          🃏 Meus Decks ({filteredOwn.length})
         </h3>
-        {ownDecks.length === 0 ? (
-          <div className="card" style={{ textAlign: "center", padding: 32, color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>🃏</div>
-            <div style={{ fontFamily: "'Cinzel', serif", fontSize: 13 }}>Nenhum deck cadastrado ainda</div>
+        {filteredOwn.length === 0 ? (
+          <div className="card" style={{ textAlign: "center", padding: 28, color: "var(--muted)" }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>🃏</div>
+            <div style={{ fontSize: 13 }}>
+              {activeFormat === "Todos" ? "Nenhum deck cadastrado ainda" : `Nenhum deck em ${activeFormat}`}
+            </div>
           </div>
         ) : (
           <div className="grid-decks" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
-            {ownDecks.map(d => <DeckCard key={d.id} deck={d} />)}
+            {filteredOwn.map(d => <DeckCard key={d.id} deck={d} />)}
           </div>
         )}
       </div>
 
+      {/* Meta Decks */}
       <div>
-        <h3 style={{ fontSize: 14, color: "var(--muted)", marginBottom: 12, fontFamily: "'Cinzel', serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          📖 Meta Decks ({metaDecks.length})
+        <h3 style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12, fontFamily: "'Cinzel', serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          📖 Meta Decks ({filteredMeta.length})
         </h3>
-        {metaDecks.length === 0 ? (
+        {filteredMeta.length === 0 ? (
           <div className="card" style={{ textAlign: "center", padding: 24, color: "var(--muted)", fontSize: 13 }}>
-            Nenhum deck do meta cadastrado
+            {activeFormat === "Todos" ? "Nenhum deck do meta cadastrado" : `Nenhum deck do meta em ${activeFormat}`}
           </div>
         ) : (
           <div className="grid-decks" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
-            {metaDecks.map(d => <DeckCard key={d.id} deck={d} />)}
+            {filteredMeta.map(d => <DeckCard key={d.id} deck={d} />)}
           </div>
         )}
       </div>
