@@ -75,8 +75,11 @@ const GlobalStyle = () => (
       transition: all 0.2s;
       text-transform: uppercase;
       white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
     .btn:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold2); }
+    .btn:active { transform: scale(0.97); }
     .btn.primary {
       background: linear-gradient(135deg, #b8942a, #c9a84c);
       border-color: var(--gold2);
@@ -93,11 +96,12 @@ const GlobalStyle = () => (
       border-radius: var(--radius);
       color: var(--text);
       font-family: 'Crimson Pro', serif;
-      font-size: 15px;
+      font-size: 16px; /* 16px evita zoom automático no iOS */
       padding: 10px 14px;
       width: 100%;
       transition: border-color 0.2s;
       outline: none;
+      -webkit-appearance: none;
     }
     input:focus, select:focus, textarea:focus {
       border-color: var(--gold);
@@ -154,6 +158,98 @@ const GlobalStyle = () => (
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
     @keyframes shimmer { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
     .fade-in { animation: fadeIn 0.35s ease both; }
+
+    /* ── MOBILE ──────────────────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+
+      /* Nav vira bottom bar fixa */
+      .mobile-nav {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        z-index: 200;
+        background: rgba(10,12,16,0.97);
+        backdrop-filter: blur(16px);
+        border-top: 1px solid var(--border2);
+        display: flex;
+        padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+      }
+      .mobile-nav button {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 6px 4px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      .mobile-nav .nav-icon { font-size: 20px; line-height: 1; }
+      .mobile-nav .nav-label {
+        font-family: 'Cinzel', serif;
+        font-size: 8px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .mobile-nav button.active .nav-icon { filter: drop-shadow(0 0 6px var(--gold)); }
+      .mobile-nav button.active .nav-label { color: var(--gold2); }
+
+      /* Main padding-bottom para não ficar atrás da nav */
+      .main-mobile { padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important; }
+
+      /* Header compacto */
+      .header-logo-text { display: none; }
+      .header-subtitle   { display: none; }
+      .header-user-email { display: none; }
+      .header-top { padding: 10px 0 8px !important; }
+      .header-top-inner { padding: 0 16px !important; }
+
+      /* Cards com padding menor */
+      .card { padding: 14px; }
+
+      /* Grids: 1 coluna */
+      .grid-stats   { grid-template-columns: repeat(2, 1fr) !important; }
+      .grid-decks   { grid-template-columns: 1fr !important; }
+
+      /* Hero banner compacto */
+      .hero-wr { font-size: 40px !important; }
+
+      /* Formulários: grids viram 1 col */
+      .form-grid-2 { grid-template-columns: 1fr !important; }
+      .form-grid-3 { grid-template-columns: 1fr 1fr !important; }
+      .form-grid-4 { grid-template-columns: 1fr 1fr !important; }
+
+      /* Matchup table: oculta colunas menos importantes */
+      .mu-col-hide { display: none !important; }
+
+      /* Modal: tela cheia */
+      .deck-modal-inner {
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        min-height: 100dvh;
+      }
+      .deck-modal-wrap {
+        padding: 0 !important;
+        align-items: flex-start !important;
+      }
+
+      /* Inline form: grids */
+      .inline-deck-grid { grid-template-columns: 1fr !important; }
+
+      /* Filter bar: wrap */
+      .filter-bar { flex-wrap: wrap !important; gap: 8px !important; }
+      .filter-bar select { font-size: 12px !important; }
+
+      /* Match card: stack */
+      .match-card-inner { flex-wrap: wrap !important; gap: 8px !important; }
+
+      /* Oculta texto longo no header */
+      .user-email-full { display: none !important; }
+    }
   `}</style>
 );
 
@@ -201,70 +297,84 @@ const StatCard = ({ label, value, sub, accent = "gold" }) => {
 // ─── MOCK DATA (removido — dados vêm do Supabase) ────────────────────────────
 
 // ─── HEADER ───────────────────────────────────────────────────────────────────
+const NAV_TABS = [
+  { key: "dashboard", label: "Dashboard", icon: "⚡" },
+  { key: "matches",   label: "Partidas",  icon: "📜" },
+  { key: "new",       label: "Registrar", icon: "➕" },
+  { key: "matchups",  label: "Matchups",  icon: "⚔️" },
+  { key: "decks",     label: "Decks",     icon: "🃏" },
+];
+
 const Header = ({ page, setPage, user, onLogout }) => (
-  <header style={{
-    borderBottom: "1px solid var(--border)",
-    background: "rgba(10,12,16,0.95)",
-    backdropFilter: "blur(12px)",
-    position: "sticky", top: 0, zIndex: 100,
-  }}>
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
-      {/* Logo row */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0 10px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <svg width="36" height="36" viewBox="0 0 36 36" style={{ flexShrink: 0 }}>
-            <defs>
-              <radialGradient id="lg" cx="50%" cy="30%">
-                <stop offset="0%" stopColor="#f5dfa0"/>
-                <stop offset="100%" stopColor="#8a5a1a"/>
-              </radialGradient>
-            </defs>
-            <circle cx="18" cy="18" r="17" fill="url(#lg)" stroke="rgba(201,168,76,0.5)" strokeWidth="1"/>
-            <text x="18" y="25" textAnchor="middle" fontSize="18" fontFamily="serif" fill="#0a0c10">⚡</text>
-          </svg>
-          <div>
-            <div style={{ fontFamily: "'Cinzel', serif", fontSize: 18, fontWeight: 900, color: "var(--gold2)", letterSpacing: "0.1em", lineHeight: 1 }}>TEAM GRAPESHOT</div>
-            <div style={{ fontFamily: "'Crimson Pro', serif", fontSize: 11, color: "var(--muted)", letterSpacing: "0.12em", textTransform: "uppercase" }}>Match Tracker</div>
+  <>
+    <header style={{
+      borderBottom: "1px solid var(--border)",
+      background: "rgba(10,12,16,0.95)",
+      backdropFilter: "blur(12px)",
+      position: "sticky", top: 0, zIndex: 100,
+    }}>
+      <div className="header-top-inner" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
+        {/* Logo row */}
+        <div className="header-top" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0 10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <svg width="36" height="36" viewBox="0 0 36 36" style={{ flexShrink: 0 }}>
+              <defs>
+                <radialGradient id="lg" cx="50%" cy="30%">
+                  <stop offset="0%" stopColor="#f5dfa0"/>
+                  <stop offset="100%" stopColor="#8a5a1a"/>
+                </radialGradient>
+              </defs>
+              <circle cx="18" cy="18" r="17" fill="url(#lg)" stroke="rgba(201,168,76,0.5)" strokeWidth="1"/>
+              <text x="18" y="25" textAnchor="middle" fontSize="18" fontFamily="serif" fill="#0a0c10">⚡</text>
+            </svg>
+            <div>
+              <div className="header-logo-text" style={{ fontFamily: "'Cinzel', serif", fontSize: 18, fontWeight: 900, color: "var(--gold2)", letterSpacing: "0.1em", lineHeight: 1 }}>TEAM GRAPESHOT</div>
+              <div className="header-subtitle" style={{ fontFamily: "'Crimson Pro', serif", fontSize: 11, color: "var(--muted)", letterSpacing: "0.12em", textTransform: "uppercase" }}>Match Tracker</div>
+            </div>
           </div>
+
+          {/* User info + logout */}
+          {user && (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: 11, color: "var(--gold)", letterSpacing: "0.06em" }}>
+                  {user.email.split("@")[0]}
+                </div>
+                <div className="user-email-full" style={{ fontSize: 10, color: "var(--muted)" }}>{user.email}</div>
+              </div>
+              <button className="btn sm danger" onClick={onLogout} style={{ fontSize: 10 }}>Sair</button>
+            </div>
+          )}
         </div>
 
-        {/* User info + logout */}
-        {user && (
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 11, color: "var(--gold)", letterSpacing: "0.06em" }}>
-                {user.email.split("@")[0]}
-              </div>
-              <div style={{ fontSize: 10, color: "var(--muted)" }}>{user.email}</div>
-            </div>
-            <button className="btn sm danger" onClick={onLogout} style={{ fontSize: 10 }}>Sair</button>
-          </div>
-        )}
+        {/* Desktop nav tabs — hidden on mobile via display logic */}
+        <nav style={{ display: "flex", gap: 2 }} className="desktop-nav">
+          {NAV_TABS.map(tab => (
+            <button key={tab.key} onClick={() => setPage(tab.key)} style={{
+              fontFamily: "'Cinzel', serif", fontSize: 11, letterSpacing: "0.07em",
+              background: "none", border: "none", cursor: "pointer",
+              color: page === tab.key ? "var(--gold2)" : "var(--muted)",
+              padding: "8px 16px",
+              borderBottom: page === tab.key ? "2px solid var(--gold)" : "2px solid transparent",
+              transition: "all 0.2s",
+            }}>
+              {tab.icon} {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
+    </header>
 
-      {/* Nav tabs */}
-      <nav style={{ display: "flex", gap: 2 }}>
-        {[
-          { key: "dashboard", label: "⚡ Dashboard" },
-          { key: "matches", label: "📜 Partidas" },
-          { key: "new", label: "+ Registrar" },
-          { key: "matchups", label: "⚔️ Matchups" },
-          { key: "decks", label: "🃏 Decks" },
-        ].map(tab => (
-          <button key={tab.key} onClick={() => setPage(tab.key)} style={{
-            fontFamily: "'Cinzel', serif", fontSize: 11, letterSpacing: "0.07em",
-            background: "none", border: "none", cursor: "pointer",
-            color: page === tab.key ? "var(--gold2)" : "var(--muted)",
-            padding: "8px 16px",
-            borderBottom: page === tab.key ? "2px solid var(--gold)" : "2px solid transparent",
-            transition: "all 0.2s",
-          }}>
-            {tab.label}
-          </button>
-        ))}
-      </nav>
-    </div>
-  </header>
+    {/* Mobile bottom nav */}
+    <nav className="mobile-nav" style={{ display: "none" }}>
+      {NAV_TABS.map(tab => (
+        <button key={tab.key} onClick={() => setPage(tab.key)} className={page === tab.key ? "active" : ""}>
+          <span className="nav-icon">{tab.icon}</span>
+          <span className="nav-label">{tab.label}</span>
+        </button>
+      ))}
+    </nav>
+  </>
 );
 
 // ─── FILTER PILL ──────────────────────────────────────────────────────────────
@@ -343,7 +453,7 @@ const Dashboard = ({ matches, decks }) => {
 
       {/* ── FILTER BAR ── */}
       <div className="card" style={{ padding: "16px 20px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <div className="filter-bar" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <span style={{ fontFamily: "'Cinzel', serif", fontSize: 10, letterSpacing: "0.1em", color: "var(--muted)", textTransform: "uppercase", flexShrink: 0 }}>
             Filtrar por
           </span>
@@ -463,7 +573,7 @@ const Dashboard = ({ matches, decks }) => {
           {hasFilter ? "Performance Filtrada" : "Performance Geral"}
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 16, flexWrap: "wrap" }}>
-          <div style={{ fontFamily: "'Cinzel', serif", fontSize: 52, fontWeight: 900, color: winRate >= 50 ? "var(--green2)" : "var(--red2)", lineHeight: 1 }}>
+          <div className="hero-wr" style={{ fontFamily: "'Cinzel', serif", fontSize: 52, fontWeight: 900, color: winRate >= 50 ? "var(--green2)" : "var(--red2)", lineHeight: 1 }}>
             {filtered.length ? winRate : "—"}<span style={{ fontSize: 22, color: "var(--muted)" }}>{filtered.length ? "%" : ""}</span>
           </div>
           <div>
@@ -494,7 +604,7 @@ const Dashboard = ({ matches, decks }) => {
       </div>
 
       {/* ── STATS GRID ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
+      <div className="grid-stats" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
         <StatCard label="Partidas" value={filtered.length} accent="gold" />
         <StatCard label="Vitórias" value={wins} accent="green" />
         <StatCard label="Derrotas" value={losses} accent="red" />
@@ -597,7 +707,7 @@ const MatchesList = ({ matches, decks, onDelete }) => {
         const myDeck = decks.find(d => d.id === m.myDeckId);
         const oppDeck = decks.find(d => d.id === m.oppDeckId);
         return (
-          <div key={m.id} className="card fade-in" style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+          <div key={m.id} className="card fade-in match-card-inner" style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
             <span className={`badge ${m.result === "W" ? "win" : m.result === "L" ? "loss" : "draw"}`} style={{ minWidth: 64, justifyContent: "center" }}>
               {m.result === "W" ? "✓ Win" : m.result === "L" ? "✗ Loss" : "— Draw"}
             </span>
@@ -652,7 +762,7 @@ const InlineDeckForm = ({ isOwn, onSave, onCancel }) => {
       <div style={{ fontSize: 11, fontFamily: "'Cinzel', serif", color: "var(--gold)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
         ✦ Novo {isOwn ? "deck próprio" : "deck do meta"}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+      <div className="inline-deck-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <div>
           <label>Nome *</label>
           <input value={df.name} onChange={e => setDf(f => ({ ...f, name: e.target.value }))} placeholder="Murktide Regent" autoFocus />
@@ -792,7 +902,7 @@ const NewMatch = ({ decks, onCreateDeckInline, onSave }) => {
             placeholder="Selecione o deck do oponente…"
           />
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+          <div className="form-grid-3" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
             {field("Evento",
               <input value={form.eventName} onChange={e => setForm(f => ({ ...f, eventName: e.target.value }))} placeholder="Ex: FNM GPSP" />
             )}
@@ -876,8 +986,8 @@ const MatchupAnalysis = ({ matches, decks }) => {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border2)", background: "var(--surface2)" }}>
-                {["Meu Deck", "vs", "Deck Oponente", "W", "L", "Total", "Win Rate", ""].map((h, i) => (
-                  <th key={i} style={{
+                {["Meu Deck", "vs", "Deck Oponente", "W", "L", "Total", "Win Rate"].map((h, i) => (
+                  <th key={i} className={i === 1 || i === 5 ? "mu-col-hide" : ""} style={{
                     padding: "12px 16px", textAlign: i >= 3 ? "center" : "left",
                     fontFamily: "'Cinzel', serif", fontSize: 10, letterSpacing: "0.08em",
                     color: "var(--gold)", textTransform: "uppercase", fontWeight: 600,
@@ -896,7 +1006,7 @@ const MatchupAnalysis = ({ matches, decks }) => {
                       <span style={{ fontSize: 14, color: "var(--white)" }}>{r.myDeck}</span>
                     </div>
                   </td>
-                  <td style={{ padding: "12px 8px", textAlign: "center", color: "var(--muted)", fontSize: 12 }}>⚔️</td>
+                  <td style={{ padding: "12px 8px", textAlign: "center", color: "var(--muted)", fontSize: 12 }} className="mu-col-hide">⚔️</td>
                   <td style={{ padding: "12px 16px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <ManaRow colors={r.oppColors} />
@@ -905,7 +1015,7 @@ const MatchupAnalysis = ({ matches, decks }) => {
                   </td>
                   <td style={{ padding: "12px 16px", textAlign: "center", color: "var(--green2)", fontFamily: "'Cinzel', serif", fontWeight: 700 }}>{r.wins}</td>
                   <td style={{ padding: "12px 16px", textAlign: "center", color: "var(--red2)", fontFamily: "'Cinzel', serif", fontWeight: 700 }}>{r.losses}</td>
-                  <td style={{ padding: "12px 16px", textAlign: "center", color: "var(--muted)" }}>{r.total}</td>
+                  <td className="mu-col-hide" style={{ padding: "12px 16px", textAlign: "center", color: "var(--muted)" }}>{r.total}</td>
                   <td style={{ padding: "12px 16px", textAlign: "center" }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                       <span style={{ fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 14, color: r.wr >= 50 ? "var(--green2)" : "var(--red2)" }}>{r.wr}%</span>
@@ -1111,13 +1221,13 @@ const DeckDetail = ({ deck, onSave, onClose }) => {
   };
 
   return (
-    <div style={{
+    <div className="deck-modal-wrap" style={{
       position: "fixed", inset: 0, zIndex: 200,
       background: "rgba(5,7,12,0.85)", backdropFilter: "blur(6px)",
       display: "flex", alignItems: "flex-start", justifyContent: "center",
       padding: "24px 16px", overflowY: "auto",
     }}>
-      <div style={{
+      <div className="deck-modal-inner" style={{
         width: "100%", maxWidth: isOwn ? 820 : 560,
         background: "var(--bg2)", border: "1px solid var(--border2)",
         borderRadius: "var(--radius2)", overflow: "hidden",
@@ -1150,7 +1260,7 @@ const DeckDetail = ({ deck, onSave, onClose }) => {
         <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Deck info */}
           <div className="card">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14 }}>
+            <div className="form-grid-4" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14 }}>
               <div>
                 <label>Nome</label>
                 <input value={info.name} onChange={e => setInfo(i => ({ ...i, name: e.target.value }))} placeholder="Murktide Regent" />
@@ -1339,7 +1449,7 @@ const DecksPage = ({ decks, onSaveDeck, onDeleteDeck, onCreateDeck }) => {
             <div style={{ fontFamily: "'Cinzel', serif", fontSize: 13 }}>Nenhum deck cadastrado ainda</div>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
+          <div className="grid-decks" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
             {ownDecks.map(d => <DeckCard key={d.id} deck={d} />)}
           </div>
         )}
@@ -1354,7 +1464,7 @@ const DecksPage = ({ decks, onSaveDeck, onDeleteDeck, onCreateDeck }) => {
             Nenhum deck do meta cadastrado
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
+          <div className="grid-decks" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
             {metaDecks.map(d => <DeckCard key={d.id} deck={d} />)}
           </div>
         )}
@@ -1672,7 +1782,7 @@ export default function App() {
       <GlobalStyle />
       <Header page={page} setPage={setPage} user={user} onLogout={handleLogout} />
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px 60px" }}>
+      <main className="main-mobile" style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px 60px" }}>
         {page === "dashboard"  && <Dashboard matches={matches} decks={decks} />}
         {page === "matches"    && <MatchesList matches={matches} decks={decks} onDelete={handleDeleteMatch} />}
         {page === "new"        && <NewMatch decks={decks} onCreateDeckInline={handleCreateDeckInline} onSave={handleSaveMatch} />}
