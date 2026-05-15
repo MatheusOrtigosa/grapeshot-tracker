@@ -231,6 +231,7 @@ const GlobalStyle = () => (
     /* Desktop: bottom nav escondida */
     @media (min-width: 641px) {
       .mobile-nav { display: none !important; }
+      .desktop-nav { display: flex !important; }
     }
   `}</style>
 );
@@ -329,16 +330,17 @@ const Header = ({ page, setPage, user, onLogout }) => (
           )}
         </div>
 
-        {/* Desktop nav tabs — hidden on mobile via display logic */}
+        {/* Desktop nav tabs */}
         <nav style={{ display: "flex", gap: 2 }} className="desktop-nav">
           {NAV_TABS.map(tab => (
             <button key={tab.key} onClick={() => setPage(tab.key)} style={{
               fontFamily: "'Cinzel', serif", fontSize: 11, letterSpacing: "0.07em",
               background: "none", border: "none", cursor: "pointer",
-              color: page === tab.key ? "var(--gold2)" : "var(--muted)",
+              color: page === tab.key ? "var(--gold)" : "var(--muted)",
               padding: "8px 16px",
-              borderBottom: page === tab.key ? "2px solid var(--gold)" : "2px solid transparent",
+              borderBottom: page === tab.key ? "2px solid var(--gold3)" : "2px solid transparent",
               transition: "all 0.2s",
+              fontWeight: page === tab.key ? 700 : 400,
             }}>
               {tab.icon} {tab.label}
             </button>
