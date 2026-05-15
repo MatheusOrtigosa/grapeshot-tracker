@@ -46,7 +46,7 @@ const GlobalStyle = () => (
       overflow-x: hidden;
     }
 
-    /* Grapeshot logo watermark + radial glow */
+    /* Ortiga logo watermark + radial glow */
     body::before {
       content: '';
       position: fixed;
@@ -315,7 +315,7 @@ const Header = ({ page, setPage, user, onLogout }) => {
               <text x="18" y="25" textAnchor="middle" fontSize="18" fontFamily="serif" fill="#2c2416">⚡</text>
             </svg>
             <div>
-              <div className="header-logo-text" style={{ fontFamily: "'Cinzel', serif", fontSize: 18, fontWeight: 900, color: "var(--orange2)", letterSpacing: "0.1em", lineHeight: 1 }}>TEAM GRAPESHOT</div>
+              <div className="header-logo-text" style={{ fontFamily: "'Cinzel', serif", fontSize: 18, fontWeight: 900, color: "var(--orange2)", letterSpacing: "0.1em", lineHeight: 1 }}>ORTIGAS</div>
               <div className="header-subtitle" style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 500, color: "var(--muted)", letterSpacing: "0.18em", textTransform: "uppercase" }}>Match Tracker</div>
             </div>
           </div>
@@ -1628,7 +1628,7 @@ const AuthScreen = ({ onAuth }) => {
             <circle cx="18" cy="18" r="17" fill="url(#lg2)" stroke="rgba(201,168,76,0.5)" strokeWidth="1"/>
             <text x="18" y="25" textAnchor="middle" fontSize="18" fontFamily="serif" fill="#0a0c10">⚡</text>
           </svg>
-          <div style={{ fontFamily: "'Cinzel', serif", fontSize: 24, fontWeight: 900, color: "var(--orange2)", letterSpacing: "0.1em" }}>TEAM GRAPESHOT</div>
+          <div style={{ fontFamily: "'Cinzel', serif", fontSize: 24, fontWeight: 900, color: "var(--orange2)", letterSpacing: "0.1em" }}>ORTIGAS</div>
           <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 500, color: "var(--muted)", letterSpacing: "0.18em", textTransform: "uppercase", marginTop: 4 }}>Match Tracker</div>
         </div>
 
@@ -1675,7 +1675,7 @@ const AuthScreen = ({ onAuth }) => {
         </div>
 
         <div style={{ textAlign: "center", marginTop: 16, fontSize: 12, color: "var(--muted)" }}>
-          Acesso exclusivo — Team Grapeshot
+          Acesso exclusivo — Ortigas' Match Tracker
         </div>
       </div>
     </div>
@@ -1807,7 +1807,7 @@ export default function App() {
 
       <footer style={{ borderTop: "1px solid var(--border)", padding: "16px 24px", textAlign: "center" }}>
         <div style={{ fontFamily: "'Cinzel', serif", fontSize: 11, color: "var(--muted)", letterSpacing: "0.1em" }}>
-          ⚡ TEAM GRAPESHOT · MATCH TRACKER · <span style={{ color: "var(--border2)" }}>storm count: {matches.length}</span>
+          ⚡ ORTIGAS' MATCH TRACKER · <span style={{ color: "var(--border2)" }}>partidas: {matches.length}</span>
         </div>
       </footer>
     </>
